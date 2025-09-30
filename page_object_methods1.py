@@ -1,34 +1,31 @@
 from selenium.webdriver.common.by import By
 
+class RegistrationPageAround:
+    # El localizador del campo Correo electrónico
+    email_field = (By.ID, 'email')
+    # El localizador del campo Contraseña
+    password_field = (By.ID, 'password')
+    # El localizador del botón Registrarse
+    registration_button = (By.CLASS_NAME, 'auth-form__button')
 
-class HomePageAround:
-    # El localizador del botón Agregar
-    add_new_place_button = (By.CLASS_NAME, 'profile__add-button')
-    # El localizador del campo Nombre
-    name_field = (By.NAME, 'name')
-    # El localizador del campo Enlace a la imagen
-    link_to_picture_field = (By.NAME, 'link')
-    # El localizador del botón Guardar
-    save_button = (By.XPATH, ".//form[@name='new-card']/button[text()='Guardar']")
-
+    # El constructor de clase
     def __init__(self, driver):
         self.driver = driver
 
-    # El método hace clic en el botón Agregar
-    def click_add_new_place_button(self):
-        self.driver.find_element(*self.add_new_place_button).click()
+    # El método rellena el campo Correo electrónico
+    def set_email(self, email):
+        self.driver.find_element(*self.email_field).send_keys(email)
 
-    # El método introduce el nombre del nuevo lugar
-    def set_name(self):
-        new_title = "Новое место"
-        self.driver.find_element(*self.name_field).send_keys(new_title)
+    # El método rellena el campo Contraseña
+    def set_password(self, password):
+        self.driver.find_element(*self.password_field).send_keys(password)
 
-    # El método introduce un enlace a la imagen
-    def set_link_to_picture_field(self):
-        self.driver.find_element(*self.link_to_picture_field).send_keys("Enlace a la imagen")
+    # El método hace clic en el botón Registrarse
+    def click_registration_button(self):
+        self.driver.find_element(*self.registration_button).click()
 
-    # El método hace clic en el botón Guardar
-    def click_save_button(self):
-        self.driver.find_element(*self.save_button).click()
-
-    # El paso para agregar un nuevo lugar
+    # El método de registro combina el correo electrónico, la contraseña y el clic del botón
+    def register(self, email, password):
+        self.set_email(email)
+        self.set_password(password)
+        self.click_registration_button()

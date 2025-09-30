@@ -3,7 +3,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
-
 # Clase para la página de inicio de sesión
 class LoginPageAround:
     email_field = (By.ID, 'email')
@@ -14,7 +13,9 @@ class LoginPageAround:
         self.driver = driver
 
     def set_email(self, email):
-        self.driver.find_element(*self.email_field).send_keys(email)
+        wait = WebDriverWait(self.driver, 10)
+        email_element = wait.until(expected_conditions.presence_of_element_located(self.email_field))
+        email_element.send_keys(email)
 
     def set_password(self, password):
         self.driver.find_element(*self.password_field).send_keys(password)
@@ -27,23 +28,18 @@ class LoginPageAround:
         self.set_password(password)
         self.click_sign_in_button()
 
-
 # Clase para el encabezado
 class HeaderPageAround:
-    # Crea un localizador para el elemento Correo electrónico en el encabezado
-    header_user = ...
+    header_user = (By.CLASS_NAME, 'header__user')
 
     def __init__(self, driver):
         self.driver = driver
 
-    # Espera a que se cargue la página
     def wait_for_load_header(self):
         WebDriverWait(self.driver, 3).until(expected_conditions.visibility_of_element_located(self.header_user))
 
-    # Método para recuperar el texto del elemento en el encabezado
     def email_in_header(self):
-        ...
-
+        return self.driver.find_element(*self.header_user).text
 
 # Clase con la prueba automatizada
 class TestAround:
@@ -52,32 +48,22 @@ class TestAround:
 
     @classmethod
     def setup_class(cls):
-        # Crea un controlador para Chrome
         cls.driver = webdriver.Chrome()
 
     def test_check_email_in_header(self):
-        # Abre la página de la aplicación de prueba
         self.driver.get('https://around-v1.nm.tripleten-services.com/signin?lng=es')
 
-        # Crea una clase de objeto de página para la página de inicio de sesión
-        ...
-        # iniciar sesión
-        correo electrónico = "Introduce tu correo electrónico"
-        contraseña = "Introduce tu contraseña"
-        # Pasa estas variables al método.
-        ...
+        login_page = LoginPageAround(self.driver)
+        email = "tomas.granados@gmail.com"
+        password = "qaengineer"
+        login_page.login(email, password)
 
-        # Crea un objeto para el encabezado
-        ...
-        # Espera a que se cargue el encabezado
-        ...
-        # Recupera el texto de un elemento en el encabezado
-        email_from_header = ...
+        header_page = HeaderPageAround(self.driver)
+        header_page.wait_for_load_header()
+        email_from_header = header_page.email_in_header()
 
-        # Comprueba que el valor recuperado coincida con el correo electrónico
-        assert ...
+        assert email_from_header == email
 
     @classmethod
     def teardown_class(cls):
-        # Cerrar el navegador
-        ...
+        cls.driver.quit()

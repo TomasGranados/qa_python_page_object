@@ -3,8 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
-
-# Clase para la página de inicio de sesión
+# clase para la página de inicio de sesión
 class LoginPageAround:
     email_field = (By.ID, 'email')
     password_field = (By.ID, 'password')
@@ -14,7 +13,9 @@ class LoginPageAround:
         self.driver = driver
 
     def set_email(self, email):
-        self.driver.find_element(*self.email_field).send_keys(email)
+        wait = WebDriverWait(self.driver, 10)
+        email_element = wait.until(expected_conditions.presence_of_element_located(self.email_field))
+        email_element.send_keys(email)
 
     def set_password(self, password):
         self.driver.find_element(*self.password_field).send_keys(password)
@@ -27,23 +28,22 @@ class LoginPageAround:
         self.set_password(password)
         self.click_sign_in_button()
 
-
-# Clase para la página principal
+# clase para la página principal
 class HomePageAround:
     # Crea un localizador para el campo Ocupación en el perfil de usuario
-    profile_description = ...
+    profile_description = (By.CLASS_NAME, 'profile__description')
 
     def __init__(self, driver):
         self.driver = driver
 
+    # Espera a que se cargue la página
     # Espera a que aparezca el campo Ocupación
     def wait_for_load_home_page(self):
         WebDriverWait(self.driver, 3).until(expected_conditions.visibility_of_element_located(self.profile_description))
 
     # Recupera el valor del campo Ocupación
     def get_description(self):
-        return ...
-
+        return self.driver.find_element(*self.profile_description).text
 
 class TestAround:
 
@@ -59,21 +59,21 @@ class TestAround:
         self.driver.get('https://around-v1.nm.tripleten-services.com/signin?lng=es')
 
         # Crea una clase de objeto de página para la página de inicio de sesión
-        ...
-        # iniciar sesión
-        ...
+        login_page = LoginPageAround(self.driver)
+        # Iniciar sesión
+        login_page.login('tomas.granados@gmail.com', 'qaengineer')
 
         # Crea un objeto de página para la página principal
-        ...
+        home_page = HomePageAround(self.driver)
         # Espera a que se cargue la página principal
-        ...
+        home_page.wait_for_load_home_page()
         # Guarda el valor de Ocupación en la descripción
-        description = ...
+        description = home_page.get_description()
 
         # Utiliza assert para comprobar que el valor actual de Ocupación coincida con el valor esperado
-        assert ...
+        assert description == 'Explorer'
 
     @classmethod
     def teardown_class(cls):
-        # Cerrar el navegador
-        ...
+        # cerrar el navegador
+        cls.driver.quit()
